@@ -1,0 +1,534 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+}
+
+/* Fixed 1080 x 1920 base */
+.base {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+}
+
+.map-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Idle / Inactivity Sticker ------------------------------------------------------*/
+
+@keyframes stickerShake {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(3deg); }
+  40%  { transform: rotate(-3deg); }
+  60%  { transform: rotate(3deg); }
+  80%  { transform: rotate(-3deg); }
+  100% { transform: rotate(0deg); }
+}
+
+#idle-sticker.shake {
+  animation: stickerShake 0.6s ease;
+}
+
+#idle-sticker {
+  position: fixed;
+  top: 60px;
+  right: 50px;
+  width: 150px;
+  cursor: pointer;
+  z-index: 9999;
+  transition: transform 0.3s ease;
+}
+
+#idle-sticker:hover {
+  transform: scale(1.08);
+}
+
+/* Overlay container */
+#idle-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+#idle-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#idle-overlay.hidden {
+  display: none;
+}
+
+/* Gray dim background */
+.idle-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+/* Sway animation */
+@keyframes sway {
+  0%   { transform: translateX(-50%) rotate(0deg); }
+  25%  { transform: translateX(-50%) rotate(4deg); }
+  50%  { transform: translateX(-50%) rotate(0deg); }
+  75%  { transform: translateX(-50%) rotate(-4deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+/* Bottom-center PNG title */
+.idle-title {
+  position: absolute;
+  bottom: -90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  animation: sway 3s ease-in-out infinite;
+}
+
+/* Speech boxes */
+.idle-box {
+  background: #f8971f;
+  color: white;
+  padding: 32px 48px;
+  border-radius: 18px;
+  font-size: 48px;
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  text-align: center;
+
+  width: 130%;
+  max-width: 900px;
+
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.idle-box.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.idle-box.fade-out {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Modal overlay */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* PNG popup (field stations only now) */
+.popup-image {
+  width: 100%;
+  max-width: 1080px;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.popup-image.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ecoregion icon strips ---------------------------------------------------------------------------------------------------------------*/
+.icon-strip {
+  width: 100%;
+  max-width: 900px;
+  height: 180px;              /* adjust as needed */
+  margin: 20px auto 0 auto;
+
+  background-color: var(--eco-strip-color);
+  border: 3px solid white;
+  box-shadow: 0 0 25px rgba(255,255,255,0.9);
+  border-radius: 12px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-strip-inner {
+  display: flex;
+  flex-direction: row;
+  gap: 35px;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-item {
+  height: 100px;     /* adjust until it looks perfect */
+  width: auto;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+@keyframes wiggle {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(5deg); }
+  50%  { transform: rotate(-5deg); }
+  75%  { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.icon-item.wiggle {
+  animation: wiggle 0.6s ease-in-out;
+}
+
+.icon-item:hover {
+  animation: none !important;
+  transform: scale(1.15);
+}
+
+.icon-item.active {
+  transform: scale(1.25);     /* slightly bigger */
+  transition: transform 0.2s ease;
+}
+
+/* Icon page content (description + video) */
+.icon-page-content {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 10px;
+}
+
+.icon-page-description {
+  flex: 1;
+  font-size: 40px;
+  line-height: 1.4;
+}
+
+.icon-page-video {
+  width: 200px;        /* square video */
+  height: 200px;
+  object-fit: cover;   /* keeps it nicely cropped */
+  border-radius: 12px;
+  border: 2px solid white;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+
+area:hover {
+  cursor: pointer;
+}
+
+.detail-image {
+  position: absolute;
+  top: 320px;
+  width: 100%;
+  max-width: 1080px;
+  display: none;
+  z-index: 10001;
+  pointer-events: none;
+}
+
+.detail-image.show {
+  display: block;
+  opacity: 1;
+}
+
+/* --- NEW ECOREGION INFO BOX ------------------------------------------------------ */
+
+.eco-box {
+  position: relative;
+  width: 80%;
+  max-width: 900px;
+  background: white;
+  border: 6px solid white;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 0 25px rgba(255,255,255,0.9);
+  margin-bottom: 40px;
+  animation: ecoFade 0.35s ease-out;
+  z-index: 9998;
+}
+
+@keyframes ecoFade {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.eco-header {
+  margin: 0 0 20px 0;
+  text-align: center;
+  font-size: 48px;
+  font-weight: bold;
+  color: #222;
+}
+
+.eco-graphic {
+  position: absolute;
+  width: auto;
+  height: 800px;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 99999;
+}
+/* NEW STATION POP UP BOX ------------------------------------------------------ */
+.station-box {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 80%;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0 0 20px rgba(255,255,255,0.9);
+  position: relative;
+  gap: 20px;
+}
+
+/* TOP HALF — image + graphic */
+.station-top {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.station-image,
+.station-graphic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.station-location {
+  font-weight: bold;
+  font-size: 1.2rem;
+  opacity: 0.85;
+}
+
+/* BOTTOM HALF — text + QR */
+.station-bottom {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* TEXT SECTION */
+.station-text {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 30px;
+  line-height: 1.5;
+}
+
+/* QR SECTION */
+.station-qr-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.station-qr {
+  width: 100%;                 /* fills entire right column */
+  height: 100%;                /* fills entire height */
+  object-fit: contain;         /* keeps QR square */
+  max-width: none;             /* removes size limit */
+  border-radius: 8px;
+}
+
+/* Close button */
+.station-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+
+
+
+/* Region-specific positions  ------------------------------*/
+.graphic-edwards-plateau {
+  top: 30%;
+  left: 85%;
+}
+
+.graphic-gulf-prairies {
+  top: 40%;
+  left: 80%;
+}
+
+.graphic-cross-timbers {
+  top: 3%;
+  left: 90%;
+}
+
+.graphic-trans-pecos {
+  top: 35%;
+  left: 95%;
+}
+
+.graphic-high-plains {
+  top: 45%;
+  left: 90%;
+}
+
+.graphic-rolling-plains {
+  top: 38%;
+  left: 85%;
+}
+
+.graphic-post-oak-savannah {
+  top: 50%;
+  left: 85%;
+}
+
+.graphic-south-texas-plains {
+  top: 52%;
+  left: 78%;
+}
+
+.graphic-piney-woods {
+  top: 37%;
+  left: 80%;
+}
+
+.graphic-blackland-prairies {
+  top: 40%;
+  left: 90%;
+}
+
+
+
+
+
+
+.eco-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.eco-description {
+  font-size: 32px;
+  line-height: 1.4;
+  color: #222;
+}
+
+.eco-image-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.eco-image {
+  width: 100%;
+  border-radius: 12px;
+  display: block;
+}
+
+/* More-info button */
+.eco-more-info {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* Caption box (made to expand from more info button) */
+.eco-caption-box {
+  position: absolute;
+  bottom: 15px;
+  left: 12px;
+  max-width: 70%;
+  background: rgba(0,0,0,0.75);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  line-height: 1.3;
+  display: none;
+  z-index: 6;
+  animation: captionExpand 0.15s ease-out;
+}
+
+@keyframes captionExpand {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+#iconStrip {
+  width: 100%;
+  max-width: 900px;   /* or whatever ecoBox width is */
+  display: none;      /* hidden until ecoregion is clicked */
+  margin: 20px auto 0 auto;
+  border-radius: 16px;
+  border: 3px solid white;
+  box-shadow: 0 0px 25px rgba(255, 255, 255, 0.9);
+  animation: ecoFade 0.35s ease-out;
+}
+
+.eco-close {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font-size: 48px;
+  cursor: pointer;
+  color: white;
+  text-shadow: 0 0 6px black;
+  z-index: 9999;
+}
+
+/* Region colors */
+.region-trans-pecos { background-color: #fcb458; }
+.region-high-plains { background-color: #ffd55f; }
+.region-rolling-plains { background-color: #f88d00; }
+.region-edwards-plateau { background-color: #fbf2ed; }
+.region-cross-timbers { background-color: #e69372; }
+.region-blackland-prairies { background-color: #9d4b2b; }
+.region-post-oak-savannah { background-color: #ffdfb4; }
+.region-south-texas-plains { background-color: #fecab3; }
+.region-piney-woods { background-color: #9d6c2a; }
+.region-gulf-prairies { background-color: #eab56d; }
